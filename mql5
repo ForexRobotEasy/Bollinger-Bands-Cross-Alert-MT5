@@ -1,0 +1,63 @@
+
+//+------------------------------------------------------------------+
+//|                                      Bollinger Bands Cross Alert MT5|
+//|                                         Developer's Site - forexroboteasy.com|
+//|                                         Developed by - Forex Robot Easy Team|
+//+------------------------------------------------------------------+
+
+//--- input parameters
+input int BollingerPeriod=20;                     // Bollinger Bands period
+input double StdDeviationMultiplier=2.0;          // Standard deviation multiplier
+
+//--- global variables
+double upperBandBuffer[];
+double lowerBandBuffer[];
+double closeBuffer[];
+
+//--- initialization function
+int OnInit()
+{
+   //--- allocate memory for buffers
+   ArrayResize(upperBandBuffer, Bars);
+   ArrayResize(lowerBandBuffer, Bars);
+   ArrayResize(closeBuffer, Bars);
+
+   //--- calculate Bollinger Bands for the specified period
+   ArraySetAsSeries(closeBuffer, true);
+   ArraySetAsSeries(upperBandBuffer, true);
+   ArraySetAsSeries(lowerBandBuffer, true);
+   ArrayBollingerBands(closeBuffer, 0, BollingerPeriod, StdDeviationMultiplier, 0, MODE_SMA, upperBandBuffer, lowerBandBuffer);
+
+   return(INIT_SUCCEEDED);
+}
+
+//--- start function
+void OnTick()
+{
+   //--- check if the current price crossed above the upper band
+   if(CrossedAbove(closeBuffer, upperBandBuffer, 1))
+   {
+      //--- generate buy signal
+      //--- place your buy order execution code here
+      //--- include stop-loss and take-profit parameters
+      Print('Buy signal generated');
+   }
+
+   //--- check if the current price crossed below the lower band
+   if(CrossedBelow(closeBuffer, lowerBandBuffer, 1))
+   {
+      //--- generate sell signal
+      //--- place your sell order execution code here
+      //--- include stop-loss and take-profit parameters
+      Print('Sell signal generated');
+   }
+}
+
+//--- end function
+void OnDeinit(const int reason)
+{
+   //--- free memory allocated for buffers
+   ArrayFree(upperBandBuffer);
+   ArrayFree(lowerBandBuffer);
+   ArrayFree(closeBuffer);
+}
